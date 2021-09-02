@@ -89,7 +89,7 @@ function registerNotification() {
 
 function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) { return false }
-  navigator.serviceWorker.register('/service-worker.js').then((registration) => {
+  navigator.serviceWorker.register('/firebase-messanging-sw.js').then((registration) => {
     console.log(`service worker scope ${registration.scope}`)
   }).catch((err) => { 
     console.log('service worker failed')

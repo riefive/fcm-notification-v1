@@ -13,7 +13,7 @@ fetch('/config.json').then((response) => response.json()).then((config) => {
     const notificationTitle = payload.notification.title;
     const notificationOptions = {
       body: payload.notification.body,
-      icon: '/pasarin.png'
+      icon: 'pasarin.png'
     }
     self.registration.showNotification(notificationTitle, notificationOptions)
   })

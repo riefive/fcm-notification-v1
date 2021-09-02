@@ -1,20 +1,17 @@
-var CACHE_NAME = 'pasarin-cache'
-var urlsToCache = []
+importScripts('/service-worker-default.js')
+importScripts('https://www.gstatic.com/firebasejs/9.0.1/firebase-app.js')
+importScripts('https://www.gstatic.com/firebasejs/9.0.1/firebase-messaging.js')
 
-self.addEventListener('install', (event) => {
-	event.waitUntil(
-		caches.open(CACHE_NAME).then((cache) => { return cache.addAll(urlsToCache) })
-	)
-})
+fetch('/config.json').then((response) => response.json()).then((config) => {
+  firebase.initializeApp(config)
+  const messaging = firebase.messaging()
 
-self.addEventListener('activate', (event) => {
-	event.waitUntil(
-    Promise.all(
-      caches.keys().then(cacheNames => {
-        return cacheNames.map(name => { if (name !== cacheStorageKey) { return caches.delete(name) } })
-      })
-    ).then(() => {
-      return self.clients.claim()
-    })
-	)
+  messaging.onBackgroundMessage((payload) => {
+      const notificationTitle = payload.notification.title;
+      const notificationOptions = {
+        body: payload.notification.body,
+        icon: '/pasarin.png'
+      }
+      self.registration.showNotification(notificationTitle, notificationOptions)
+  })
 })

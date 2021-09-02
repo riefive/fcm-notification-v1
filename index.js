@@ -23,6 +23,18 @@ function getOptionMessage() {
   return options
 }
 
+function getLocalNotification() {
+  if (!('localStorage' in window)) { return null }
+  let notificationStates = null
+  const notificationStatesRaw = localStorage.getItem('notification')
+  if (notificationStatesRaw) {
+    try {
+      notificationStates = JSON.parse(notificationStatesRaw)
+    } catch (error) {}
+  }
+  return notificationStates
+}
+
 function getRequestNotification() {
   if (!('Notification' in window)) { return false }
   Notification.requestPermission().then((status) => {
@@ -48,14 +60,7 @@ function destroyStorageNotification() {
 }
 
 function updateStorageNotification() {
-  if (!('localStorage' in window)) { return false }
-  let notificationStates = null
-  const notificationStatesRaw = localStorage.getItem('notification')
-  if (notificationStatesRaw) {
-    try {
-      notificationStates = JSON.parse(notificationStatesRaw)
-    } catch (error) {}
-  }
+  const notificationStates = getLocalNotification()
   if (notificationStates) {
     const dateNow = new Date()
     const dateExp = notificationStates.dateTime ? new Date(notificationStates.dateTime) : new Date()
@@ -101,6 +106,13 @@ function registerServiceWorker() {
 function main() {
   registerNotification()
   registerServiceWorker()
+  if (document) {
+    const target = document.getElementById('target')
+    if (target) {
+      // const 
+      // target.innerText = 
+    }
+  }
 }
 
 main()

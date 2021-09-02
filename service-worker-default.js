@@ -1,20 +1,20 @@
-var CACHE_NAME = 'pasarin-cache'
-var urlsToCache = ['/config.json']
+const CACHE_NAME = 'pasarin-cache'
 
 self.addEventListener('install', (event) => {
-	event.waitUntil(
-		caches.open(CACHE_NAME).then((cache) => { return cache.addAll(urlsToCache) })
-	)
+  const preCache = async () => {
+    const cache = await caches.open(CACHE_NAME)
+    return cache.addAll(['/config.json'])
+  }
+	event.waitUntil(preCache())
 })
 
 self.addEventListener('activate', (event) => {
-	event.waitUntil(
-    Promise.all(
-      caches.keys().then(cacheNames => {
-        return cacheNames.map(name => { if (name !== cacheStorageKey) { return caches.delete(name) } })
-      })
-    ).then(() => {
-      return self.clients.claim()
+  const preCache = async () => {
+    const cacheNames = await caches.keys()
+    if (!Array.isArray(cacheNames)) { return false }
+    cacheNames.forEach(name => { 
+      if (name !== CACHE_NAME) { return caches.delete(name) } 
     })
-	)
+  }
+	event.waitUntil(preCache())
 })

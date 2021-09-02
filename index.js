@@ -90,7 +90,7 @@ function registerNotification() {
 function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) { return false }
   navigator.serviceWorker.register('/service-worker.js').then((registration) => {
-    console.log(`service worker id ${registration.scope}`)
+    console.log(`service worker scope ${registration.scope}`)
   }).catch((err) => { 
     console.log('service worker failed')
   })
@@ -103,16 +103,48 @@ function registerServiceWorker() {
   }
 }
 
+function registerFirebaseToken() {
+  fetch('/config.json').then((response) => response.json()).then((config) => {
+    if (!config) { return false }
+    const vapidKey = config.webPushApiId || ''
+    delete config.webPushApiId
+    firebase.initializeApp(config)
+    const messaging = firebase.messaging()
+    messaging.getToken({ vapidKey }).then((currentToken) => {
+      if (currentToken) {
+        console.log(currentToken)
+        if ('localStorage' in window) {
+          localStorage.setItem('firebaseToken', currentToken)
+        }
+        display()
+      } else {
+        console.log('No registration token available. Request permission to generate one.')
+      }
+    }).catch((err) => {
+      console.log('An error occurred while retrieving token. ', err)
+    })
+  })
+}
+
+function display() {
+  if (document) {
+    const target = document.getElementById('target')
+    if (!target) { return false }
+    if ('localStorage' in window) {
+      const fireToken = localStorage.getItem('firebaseToken')
+      const notificationState = getLocalNotification()
+      const objectData = Object.assign({ token: fireToken }, notificationState)
+      target.innerText = JSON.stringify(objectData, null, 4)
+    }
+  }
+}
+
 function main() {
   registerNotification()
   registerServiceWorker()
-  if (document) {
-    const target = document.getElementById('target')
-    if (target) {
-      // const 
-      // target.innerText = 
-    }
-  }
+  setTimeout(() => {
+    registerFirebaseToken()
+  }, 1500)
 }
 
 main()

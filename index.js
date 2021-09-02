@@ -89,7 +89,7 @@ function registerNotification() {
 
 function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) { return false }
-  navigator.serviceWorker.register('/firebase-messanging-sw.js').then((registration) => {
+  navigator.serviceWorker.register('/firebase-messaging-sw.js').then((registration) => {
     console.log(`service worker scope ${registration.scope}`)
   }).catch((err) => { 
     console.log('service worker failed')
@@ -104,12 +104,14 @@ function registerServiceWorker() {
 }
 
 function registerFirebaseToken() {
-  fetch('/config.json').then((response) => response.json()).then((config) => {
+  fetch('/config.json').then((response) => response.json()).then(async (config) => {
     if (!config) { return false }
     const vapidKey = config.webPushApiId || ''
     delete config.webPushApiId
     firebase.initializeApp(config)
     const messaging = firebase.messaging()
+
+    await new Promise(resolve => setTimeout(resolve, 1000))
     messaging.getToken({ vapidKey }).then((currentToken) => {
       if (currentToken) {
         console.log(currentToken)

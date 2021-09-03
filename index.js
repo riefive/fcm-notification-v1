@@ -89,18 +89,16 @@ function registerNotification() {
 
 function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) { return false }
-  navigator.serviceWorker.register('/firebase-messaging-sw.js').then((registration) => {
+  navigator.serviceWorker.register('/default-sw.js').then((registration) => {
     console.log(`service worker scope ${registration.scope}`)
   }).catch((err) => { 
     console.log('service worker failed')
   })
-  const isNotification = false
-  if (!isNotification) { return false }
-  if (('Notification' in window) && Notification.permission == 'granted') {
-    navigator.serviceWorker.getRegistration().then((reg) => {
-		  reg.showNotification('Notifikasi', getOptionMessage())
-		})
-  }
+  navigator.serviceWorker.register('/firebase-messaging-sw.js').then((registration) => {
+    console.log(`firebase service worker scope ${registration.scope}`)
+  }).catch((err) => { 
+    console.log('firebase service worker failed')
+  })
 }
 
 function registerFirebaseToken() {
@@ -142,11 +140,9 @@ function display() {
 }
 
 function main() {
+  registerFirebaseToken()
   registerNotification()
   registerServiceWorker()
-  setTimeout(() => {
-    registerFirebaseToken()
-  }, 1500)
 }
 
 main()
